@@ -1,0 +1,77 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Environment variables (не пушим реальные секреты)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+
+# Database (если локально)
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker (не пушим случайно созданные volumes)
+docker-compose.override.yml
+.dockerignore
+
+# Test artifacts
+result.json
+e2e-output.txt
+*.xml
+
+# Coverage reports
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Project specific (optional)
+# Если вы используете Alembic, можно добавить миграции, но их обычно коммитят:
+# alembic/versions/*.py (но не __pycache__)
+# Однако если вы хотите исключить все сгенерированные миграции, раскомментируйте:
+# alembic/versions/*.py
