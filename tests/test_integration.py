@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime, timedelta, timezone
 from httpx import AsyncClient
-from app.services.slot_generator import generate_all_slots
+from app.services.slot_generator import generate_all_slots, init_db  # <-- добавить импорт init_db
 
 @pytest.mark.asyncio
 async def test_admin_creates_room_and_schedule_user_books(client: AsyncClient, db_setup):
@@ -26,6 +26,7 @@ async def test_admin_creates_room_and_schedule_user_books(client: AsyncClient, d
     assert schedule_resp.status_code == 201
 
     # 4. Generate slots (force)
+    init_db()                               # <-- добавляем инициализацию
     await generate_all_slots()
 
     # 5. User login

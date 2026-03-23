@@ -8,9 +8,15 @@ from app.services.slot_service import SlotService
 from app.services.booking_service import BookingService
 from app.schemas import RoomCreate, ScheduleCreate, BookingCreate
 
+from unittest.mock import AsyncMock, MagicMock
+
+
 @pytest.mark.asyncio
 async def test_room_service_create_room():
     db_mock = AsyncMock()
+    db_mock.add = MagicMock()   
+    db_mock.commit = AsyncMock()
+    db_mock.refresh = AsyncMock()
     service = RoomService(db_mock)
     room_data = RoomCreate(name="Test Room")
     await service.create_room(room_data)
