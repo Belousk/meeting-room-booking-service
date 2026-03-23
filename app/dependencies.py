@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.auth import decode_token
+import uuid
 
 security = HTTPBearer()
 
@@ -12,7 +13,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         role = payload.get("role")
         if not user_id or not role:
             raise HTTPException(status_code=401, detail="Invalid token")
-        return {"id": user_id, "role": role}
+        return {"id": uuid.UUID(user_id), "role": role}
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid token")
 
