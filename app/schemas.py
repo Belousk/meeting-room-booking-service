@@ -44,13 +44,13 @@ class ScheduleCreate(BaseModel):
         return sorted(v)
 
 class ScheduleResponse(BaseModel):
-    id: UUID4
-    roomId: UUID4
-    daysOfWeek: List[int]
-    startTime: time
-    endTime: time
+    id: UUID
+    roomId: UUID = Field(..., alias="room_id")
+    daysOfWeek: List[int] = Field(..., alias="days_of_week")
+    startTime: time = Field(..., alias="start_time")
+    endTime: time = Field(..., alias="end_time")
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 class SlotResponse(BaseModel):
     id: UUID4
