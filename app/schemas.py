@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field, EmailStr, UUID4, field_validator, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, field_validator
+from uuid import UUID
 from datetime import datetime, time
 from typing import Optional, List
 from enum import Enum
@@ -19,7 +20,7 @@ class RoomCreate(BaseModel):
     capacity: Optional[int] = None
 
 class RoomResponse(BaseModel):
-    id: UUID4
+    id: UUID
     name: str
     description: Optional[str] = None
     capacity: Optional[int] = None
@@ -53,23 +54,23 @@ class ScheduleResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 class SlotResponse(BaseModel):
-    id: UUID4
-    roomId: UUID4
-    start: datetime
-    end: datetime
+    id: UUID
+    roomId: UUID = Field(..., alias="room_id")
+    start: datetime = Field(..., alias="start_time")
+    end: datetime = Field(..., alias="end_time")
 
     model_config = ConfigDict(from_attributes=True)
 
 class BookingCreate(BaseModel):
-    slotId: UUID4
+    slotId: UUID
     createConferenceLink: bool = False
 
 class BookingResponse(BaseModel):
-    id: UUID4
-    slotId: UUID4
-    userId: UUID4
+    id: UUID
+    slotId: UUID = Field(..., alias="slot_id")
+    userId: UUID = Field(..., alias="user_id")
     status: str
-    conferenceLink: Optional[str] = None
-    createdAt: Optional[datetime] = None
+    conferenceLink: Optional[str] = Field(None, alias="conference_link")
+    createdAt: Optional[datetime] = Field(None, alias="created_at")
 
     model_config = ConfigDict(from_attributes=True)
