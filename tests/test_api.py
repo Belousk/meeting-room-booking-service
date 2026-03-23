@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, timezone
 import uuid
 from app.services.room_service import RoomService
 from app.services.schedule_service import ScheduleService
@@ -32,10 +32,12 @@ async def test_schedule_service_create_schedule():
 @pytest.mark.asyncio
 async def test_slot_service_get_available_slots():
     db_mock = AsyncMock()
+    # Настраиваем мок для execute: он должен возвращать объект с методом scalars()
+    mock_result = MagicMock()
+    mock_result.scalars.return_value.all.return_value = []
+    db_mock.execute = AsyncMock(return_value=mock_result)
     service = SlotService(db_mock)
-    # Настройка мока на возврат пустого списка
-    db_mock.execute.return_value.scalars.return_value.all.return_value = []
-    slots = await service.get_available_slots(uuid.uuid4(), date.today())
+    slots = await service.get_available_slots(uuid.uuid4(), datetime.now(timezone.utc).date())
     assert slots == []
 
 @pytest.mark.asyncio
@@ -43,12 +45,12 @@ async def test_booking_service_create_booking_success():
     db_mock = AsyncMock()
     slot_id = uuid.uuid4()
     user_id = uuid.uuid4()
-    # Мокаем получение слота
-    slot_mock = AsyncMock()
-    slot_mock.start_time = datetime.utcnow() + timedelta(hours=1)
+    slot_mock = MagicMock()
+    # Используем timezone-aware datetime
+    slot_mock.start_time = datetime.now(timezone.utc) + timedelta(hours=1)
     slot_mock.room_id = uuid.uuid4()
     slot_mock.id = slot_id
-    db_mock.get.return_value = slot_mock
+    db_mock.get = AsyncMock(return_value=slot_mock)
     service = BookingService(db_mock)
     booking_data = BookingCreate(slotId=slot_id)
     booking = await service.create_booking(user_id, booking_data)
@@ -60,9 +62,9 @@ async def test_booking_service_create_booking_success():
 @pytest.mark.asyncio
 async def test_booking_service_create_booking_past_slot():
     db_mock = AsyncMock()
-    slot_mock = AsyncMock()
-    slot_mock.start_time = datetime.utcnow() - timedelta(hours=1)
-    db_mock.get.return_value = slot_mock
+    slot_mock = MagicMock()
+    slot_mock.start_time = datetime.now(timezone.utc) - timedelta(hours=1)
+    db_mock.get = AsyncMock(return_value=slot_mock)
     service = BookingService(db_mock)
     with pytest.raises(ValueError, match="Cannot book past slot"):
         await service.create_booking(uuid.uuid4(), BookingCreate(slotId=uuid.uuid4()))
@@ -70,11 +72,11 @@ async def test_booking_service_create_booking_past_slot():
 @pytest.mark.asyncio
 async def test_booking_service_cancel_booking():
     db_mock = AsyncMock()
-    booking_mock = AsyncMock()
+    booking_mock = MagicMock()
     booking_mock.id = uuid.uuid4()
     booking_mock.user_id = uuid.uuid4()
     booking_mock.status = "active"
-    db_mock.get.return_value = booking_mock
+    db_mock.get = AsyncMock(return_value=booking_mock)
     service = BookingService(db_mock)
     cancelled = await service.cancel_booking(booking_mock.id, booking_mock.user_id)
     assert cancelled.status == "cancelled"
